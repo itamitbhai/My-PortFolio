@@ -1,65 +1,63 @@
-import Image from "next/image";
+"use client";
+
+import { useCursorStore } from "@/store/cursor";
+import { site } from "@/content/site";
 
 export default function Home() {
+  const setState = useCursorStore((s) => s.setState);
+  const reset = useCursorStore((s) => s.reset);
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
+    <main className="flex flex-col">
+      <section className="flex min-h-screen flex-col justify-between p-6 md:p-10">
+        <div className="flex items-center justify-between font-mono text-mono uppercase tracking-[0.12em] text-slate">
+          <span>/index</span>
+          <span className="flex items-center gap-2">
+            <span className="h-1.5 w-1.5 rounded-full bg-amber" />
+            available — phase 1
+          </span>
+        </div>
+
+        <div className="flex flex-col gap-6">
+          <p className="font-mono text-mono uppercase tracking-[0.12em] text-slate">
+            {site.role} — {site.location}
           </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+          <h1 className="font-display text-display leading-[0.9] tracking-[-0.03em]">
+            {site.name}
+          </h1>
+          <p className="max-w-[38ch] text-sub text-slate">{site.tagline}</p>
+
+          <button
+            type="button"
+            onPointerEnter={() => setState("hover")}
+            onPointerLeave={reset}
+            className="mt-4 w-fit border-hairline border px-6 py-3 font-mono text-mono uppercase tracking-[0.12em]"
           >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+            Systems check
+          </button>
         </div>
-      </main>
-    </div>
+
+        <div className="font-mono text-mono uppercase tracking-[0.12em] text-slate">
+          scroll ↓
+        </div>
+      </section>
+
+      <section className="flex min-h-screen flex-col items-center justify-center gap-8 border-hairline border-t p-6 md:p-10">
+        <div
+          onPointerEnter={() => setState("view", "View")}
+          onPointerLeave={reset}
+          className="flex h-64 w-full max-w-md items-center justify-center border-hairline border font-mono text-mono uppercase tracking-[0.12em] text-slate"
+        >
+          hover — view state
+        </div>
+        <div
+          onPointerEnter={() => setState("drag", "Drag")}
+          onPointerLeave={reset}
+          className="flex h-64 w-full max-w-md items-center justify-center border-hairline border font-mono text-mono uppercase tracking-[0.12em] text-slate"
+        >
+          hover — drag state
+        </div>
+      </section>
+    </main>
   );
 }
