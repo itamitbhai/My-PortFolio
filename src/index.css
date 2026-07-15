@@ -1,0 +1,100 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --bg: #e9e6df;
+  --fg: #0f1115;
+  --ink: 15 17 21;
+  --bone: 233 230 223;
+  --slate: 107 111 118;
+  --slate-inverse: 159 164 172;
+}
+
+html.dark {
+  --bg: #0f1115;
+  --fg: #e9e6df;
+  --ink: 233 230 223;
+  --bone: 15 17 21;
+  --slate: 159 164 172;
+  --slate-inverse: 107 111 118;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+html {
+  position: relative;
+}
+
+body {
+  background: var(--scroll-bg, var(--bg));
+  color: var(--scroll-fg, var(--fg));
+  font-family: "Satoshi", sans-serif;
+  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+  overflow-x: hidden;
+}
+
+html.dark body {
+  background: var(--bg) !important;
+  color: var(--fg) !important;
+}
+
+::selection {
+  background: #4f2ff0;
+  color: var(--bone);
+}
+
+:focus-visible {
+  outline: 2px solid #4f2ff0;
+  outline-offset: 2px;
+}
+
+html.cursor-hidden,
+html.cursor-hidden * {
+  cursor: none !important;
+}
+
+.hairline {
+  border-color: color-mix(in srgb, currentColor 12%, transparent);
+}
+
+.skip-link {
+  position: fixed;
+  top: -100px;
+  left: 1rem;
+  z-index: 1000;
+  background: #4f2ff0;
+  color: #e9e6df;
+  padding: 0.5rem 1rem;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  transition: top 0.2s ease;
+}
+
+.skip-link:focus {
+  top: 1rem;
+}
+
+@keyframes pulse-amber {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.35;
+  }
+}
+
+.pulse-dot {
+  animation: pulse-amber 2s ease-in-out infinite;
+}
