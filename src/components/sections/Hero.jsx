@@ -1,12 +1,13 @@
 import { motion, useTransform } from "framer-motion";
-import { lazy, Suspense } from "react";
+import { lazy, Suspense, useEffect, useRef } from "react";
 
 import { site } from "../../content/site";
 import { stack } from "../../content/stack";
 import { useIsMobile } from "../../hooks/useIsMobile";
 import { useMouse } from "../../hooks/useMouse";
 import { useReducedMotion } from "../../hooks/useReducedMotion";
-import { hasWebGL } from "../../lib/utils";
+import { gsap } from "../../lib/gsap";
+import { hasWebGL, spawnRipple } from "../../lib/utils";
 import { useCursor } from "../../store/useCursor";
 import { RouteLabel } from "../layout/RouteLabel";
 import { StatusPill } from "../layout/StatusPill";
@@ -40,9 +41,10 @@ function CornerBrackets() {
   );
 }
 
-function PortraitCard() {
+function PortraitCard({ innerRef }) {
   return (
     <motion.div
+      ref={innerRef}
       initial={{ opacity: 0, y: 24 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.8, delay: 0.35, ease: [0.16, 1, 0.3, 1] }}
@@ -75,11 +77,46 @@ function PortraitCard() {
   );
 }
 
-function DetailPanel() {
+function StatValue({ value }) {
+  const ref = useRef(null);
+  const reducedMotion = useReducedMotion();
+  const match = value.match(/^(\d+)(.*)$/);
+  const number = match ? Number(match[1]) : null;
+  const suffix = match ? match[2] : "";
+
+  useEffect(() => {
+    if (!ref.current || number === null) return undefined;
+
+    if (reducedMotion) {
+      ref.current.textContent = value;
+      return undefined;
+    }
+
+    const obj = { val: 0 };
+    const ctx = gsap.context(() => {
+      gsap.to(obj, {
+        val: number,
+        duration: 1.4,
+        ease: "power2.out",
+        scrollTrigger: { trigger: ref.current, start: "top 90%", toggleActions: "play none none none" },
+        onUpdate: () => {
+          ref.current.textContent = `${Math.round(obj.val)}${suffix}`;
+        },
+      });
+    });
+
+    return () => ctx.revert();
+  }, [number, suffix, reducedMotion, value]);
+
+  return <span ref={ref} className="tabular-nums">{number === null ? value : "0"}</span>;
+}
+
+function DetailPanel({ innerRef }) {
   const featuredStack = stack.filter((item) => FEATURED_STACK.includes(item.name));
 
   return (
     <motion.div
+      ref={innerRef}
       initial={{ opacity: 0, y: 24 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.8, delay: 0.6, ease: [0.16, 1, 0.3, 1] }}
@@ -88,7 +125,9 @@ function DetailPanel() {
       <div className="grid grid-cols-2 gap-6">
         {site.stats.map((stat) => (
           <div key={stat.label} className="flex flex-col gap-1">
-            <span className="font-display text-3xl tracking-[-0.02em]">{stat.value}</span>
+            <span className="font-display text-3xl tracking-[-0.02em]">
+              <StatValue value={stat.value} />
+            </span>
             <span className="font-mono text-[10px] uppercase tracking-[0.12em] text-slate">{stat.label}</span>
           </div>
         ))}
@@ -119,14 +158,43 @@ export function Hero() {
   const reducedMotion = useReducedMotion();
   const use3D = !isMobile && !reducedMotion && hasWebGL();
 
+  const sectionRef = useRef(null);
+  const portraitRef = useRef(null);
+  const detailRef = useRef(null);
+
   const nameX = useTransform(springX, [0, window.innerWidth], [-8, 8]);
   const nameY = useTransform(springY, [0, window.innerHeight], [-8, 8]);
 
   const nameLines = site.name.split(" ");
 
+  useEffect(() => {
+    if (reducedMotion) return undefined;
+
+    const ctx = gsap.context(() => {
+      // depth-layered parallax: portrait drifts slower than the detail panel below it
+      if (portraitRef.current) {
+        gsap.to(portraitRef.current, {
+          yPercent: -6,
+          ease: "none",
+          scrollTrigger: { trigger: sectionRef.current, start: "top top", end: "bottom top", scrub: true },
+        });
+      }
+      if (detailRef.current) {
+        gsap.to(detailRef.current, {
+          yPercent: -16,
+          ease: "none",
+          scrollTrigger: { trigger: sectionRef.current, start: "top top", end: "bottom top", scrub: true },
+        });
+      }
+    }, sectionRef);
+
+    return () => ctx.revert();
+  }, [reducedMotion]);
+
   return (
     <section
       id="index"
+      ref={sectionRef}
       className="relative flex min-h-screen flex-col justify-between overflow-hidden px-6 pb-10 pt-24 md:px-10 md:pt-28"
     >
       <CornerBrackets />
@@ -170,7 +238,8 @@ export function Hero() {
                   href="#contact"
                   onMouseEnter={() => setCursor("hover")}
                   onMouseLeave={resetCursor}
-                  className="group relative inline-block overflow-hidden border border-current/15 px-8 py-4 font-mono text-[11px] uppercase tracking-[0.12em] transition-colors duration-300"
+                  onClick={(e) => spawnRipple(e, "rgba(233,230,223,0.4)")}
+                  className="btn-shine group relative inline-block overflow-hidden border border-current/15 px-8 py-4 font-mono text-[11px] uppercase tracking-[0.12em] transition-colors duration-300"
                 >
                   <span className="relative z-10 transition-colors duration-300 group-hover:text-bone">Let's talk</span>
                   <span className="absolute inset-0 z-0 origin-bottom scale-y-0 bg-ink transition-transform duration-300 ease-[0.16,1,0.3,1] group-hover:scale-y-100" />
@@ -182,7 +251,7 @@ export function Hero() {
                   href="#work"
                   onMouseEnter={() => setCursor("hover")}
                   onMouseLeave={resetCursor}
-                  className="group inline-flex items-center gap-2 px-4 py-4 font-mono text-[11px] uppercase tracking-[0.12em] text-slate transition-colors hover:text-uv"
+                  className="link-underline group inline-flex items-center gap-2 px-4 py-4 font-mono text-[11px] uppercase tracking-[0.12em] text-slate transition-colors hover:text-uv"
                 >
                   View work <span className="transition-transform duration-300 ease-out group-hover:translate-y-1">↓</span>
                 </a>
@@ -192,8 +261,8 @@ export function Hero() {
         </div>
 
         <div className="flex w-full flex-col gap-10 border-t border-current/10 pt-8 md:w-72 md:shrink-0 md:border-l md:border-t-0 md:pl-10 md:pt-0">
-          <PortraitCard />
-          <DetailPanel />
+          <PortraitCard innerRef={portraitRef} />
+          <DetailPanel innerRef={detailRef} />
         </div>
       </div>
 

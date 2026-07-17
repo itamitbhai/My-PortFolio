@@ -53,7 +53,7 @@ export function Nav() {
 
       <div className="hidden items-center gap-8 font-mono text-[11px] uppercase tracking-[0.12em] text-slate md:flex">
         {LINKS.map((link) => (
-          <a key={link.href} href={link.href} className="transition-colors hover:text-uv">
+          <a key={link.href} href={link.href} className="link-underline transition-colors hover:text-uv">
             {link.label}
           </a>
         ))}

@@ -1,3 +1,4 @@
+import { AmbientBackground } from "./components/layout/AmbientBackground";
 import { Cursor } from "./components/layout/Cursor";
 import { Footer } from "./components/layout/Footer";
 import { Grain } from "./components/layout/Grain";
@@ -11,6 +12,7 @@ import { Stack } from "./components/sections/Stack";
 import { Timeline } from "./components/sections/Timeline";
 import { Work } from "./components/sections/Work";
 import { Marquee } from "./components/ui/Marquee";
+import { SectionDivider } from "./components/ui/SectionDivider";
 import { useLenis } from "./hooks/useLenis";
 import { useReducedMotion } from "./hooks/useReducedMotion";
 
@@ -21,6 +23,7 @@ function App() {
   return (
     <>
       <Preloader />
+      <AmbientBackground />
       <Grain />
       <ScrollProgress />
       <Cursor />
@@ -28,11 +31,16 @@ function App() {
 
       <main id="main" className="relative">
         <Hero />
+        <SectionDivider variant="beam" />
         <Marquee />
         <About />
+        <SectionDivider variant="glow" />
         <Stack />
+        <SectionDivider variant="particles" />
         <Work />
+        <SectionDivider variant="wave" />
         <Timeline />
+        <SectionDivider variant="aurora" />
         <Contact />
       </main>
 

@@ -3,6 +3,7 @@ import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 
 import { site } from "../../content/site";
 import { gsap } from "../../lib/gsap";
+import { spawnRipple } from "../../lib/utils";
 import { useCursor } from "../../store/useCursor";
 import { RouteLabel } from "../layout/RouteLabel";
 
@@ -371,11 +372,14 @@ export function Contact() {
             <Magnetic>
               <button
                 type="button"
-                onClick={send}
+                onClick={(e) => {
+                  spawnRipple(e, "rgba(233,230,223,0.35)");
+                  send();
+                }}
                 disabled={status === "sending"}
                 onMouseEnter={() => setCursor("hover")}
                 onMouseLeave={resetCursor}
-                className={`${MONO} group relative isolate overflow-hidden border border-current/20 px-9 py-5 outline-none transition-colors duration-300 hover:text-bone focus-visible:ring-2 focus-visible:ring-uv disabled:opacity-50`}
+                className={`${MONO} btn-shine group relative isolate overflow-hidden border border-current/20 px-9 py-5 outline-none transition-colors duration-300 hover:text-bone focus-visible:ring-2 focus-visible:ring-uv disabled:opacity-50`}
               >
                 <span className="absolute inset-0 -z-10 origin-bottom scale-y-0 bg-uv transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-y-100" />
                 {status === "sending" ? "Sending…" : "Send request"}
