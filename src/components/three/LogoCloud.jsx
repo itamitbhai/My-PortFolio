@@ -76,12 +76,15 @@ function Logo({ item, homePosition, activeCategory, onHover }) {
       >
         <Html center transform distanceFactor={6} style={{ pointerEvents: "auto" }}>
           <div
-            className="flex h-10 w-10 cursor-pointer items-center justify-center rounded-full border"
+            className="flex h-11 w-11 cursor-pointer items-center justify-center rounded-full border backdrop-blur-sm"
             style={{
               opacity: dimmed ? 0.15 : 1,
-              borderColor: hovered ? "#4F2FF0" : "rgba(233,230,223,0.4)",
-              transform: hovered ? "scale(1.25)" : "scale(1)",
-              transition: "transform 0.2s ease, border-color 0.2s ease, opacity 0.3s ease",
+              background: hovered ? "rgba(79,47,240,0.16)" : "rgba(15,17,21,0.35)",
+              borderColor: hovered ? "#4F2FF0" : "rgba(233,230,223,0.35)",
+              borderWidth: hovered ? "1.5px" : "1px",
+              boxShadow: hovered ? "0 0 22px rgba(79,47,240,0.55)" : "none",
+              transform: hovered ? "scale(1.3)" : "scale(1)",
+              transition: "transform 0.25s ease, border-color 0.25s ease, opacity 0.3s ease, box-shadow 0.3s ease, background 0.3s ease",
             }}
           >
             {Icon && <Icon className="h-5 w-5" style={{ color: hovered ? "#4F2FF0" : "#E9E6DF" }} />}

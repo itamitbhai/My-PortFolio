@@ -4,7 +4,10 @@ import { useEffect, useRef, useState } from "react";
 import { projects } from "../../content/projects";
 import { useIsMobile } from "../../hooks/useIsMobile";
 import { gsap } from "../../lib/gsap";
+import { spawnRipple } from "../../lib/utils";
 import { useCursor } from "../../store/useCursor";
+import { RouteLabel } from "../layout/RouteLabel";
+import { CharReveal } from "../ui/CharReveal";
 import { TiltCard } from "../ui/TiltCard";
 
 function ProjectModal({ project, onClose }) {
@@ -55,43 +58,90 @@ function ProjectModal({ project, onClose }) {
   );
 }
 
-function Card({ project, imgRef, contentRef, onSelect }) {
+function Card({ project, imgWrapRef, contentRef, onSelect }) {
   const setCursor = useCursor((s) => s.setState);
   const resetCursor = useCursor((s) => s.reset);
 
   return (
-    <div className="relative flex h-full w-full shrink-0 flex-col justify-end gap-4 px-6 pb-32 pt-16 md:w-screen md:px-16 md:pb-40">
-      <TiltCard max={4} className="absolute inset-6 md:inset-16">
-        <button
-          type="button"
-          onClick={() => onSelect(project)}
-          onMouseEnter={() => setCursor("view", "View")}
-          onMouseLeave={resetCursor}
-          className="block h-full w-full overflow-hidden"
-        >
-          <motion.img
-            ref={imgRef}
-            layoutId={`project-image-${project.slug}`}
-            src={project.image}
-            alt={project.name}
-            className="h-full w-full scale-[1.15] object-cover"
-          />
-        </button>
-      </TiltCard>
+    <div className="relative flex h-full w-full shrink-0 flex-col justify-end gap-6 px-6 pb-28 pt-16 md:w-screen md:gap-8 md:px-16 md:pb-36">
+      <motion.div
+        className="glow-border absolute inset-6 md:inset-16"
+        initial={false}
+        whileHover={{ y: -8 }}
+        transition={{ type: "spring", stiffness: 260, damping: 22 }}
+        style={{
+          filter: "drop-shadow(0 30px 60px rgba(0,0,0,0.5))",
+        }}
+      >
+        <TiltCard max={5} className="h-full w-full">
+          <div className="group relative h-full w-full overflow-hidden border border-bone/15 bg-bone/5">
+            <button
+              type="button"
+              onClick={() => onSelect(project)}
+              onMouseEnter={() => setCursor("view", "View project")}
+              onMouseLeave={resetCursor}
+              className="relative block h-full w-full overflow-hidden"
+            >
+              {/* GSAP-owned parallax layer — xPercent only, never touched by CSS/hover transforms */}
+              <div ref={imgWrapRef} className="absolute inset-0 h-full w-full">
+                <motion.img
+                  layoutId={`project-image-${project.slug}`}
+                  src={project.image}
+                  alt={project.name}
+                  className="h-full w-full scale-[1.08] object-cover transition-transform duration-[900ms] ease-out group-hover:scale-[1.2]"
+                />
+              </div>
 
-      <div ref={contentRef} className="flex flex-col gap-4">
-        <div className="relative flex flex-col gap-2 font-mono text-[11px] uppercase tracking-[0.12em] text-bone">
-          <span>/{project.index}</span>
+              {/* legibility scrim + hover-brighten gradient glow */}
+              <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-ink via-ink/15 to-transparent opacity-80 transition-opacity duration-500 group-hover:opacity-55" />
+              <div className="pointer-events-none absolute inset-0 bg-uv/0 transition-colors duration-500 group-hover:bg-uv/[0.08]" />
+            </button>
+
+            {/* premium framing */}
+            <span aria-hidden="true" className="pointer-events-none absolute left-0 top-0 z-10 h-3.5 w-3.5 border-l border-t border-bone/50" />
+            <span aria-hidden="true" className="pointer-events-none absolute right-0 top-0 z-10 h-3.5 w-3.5 border-r border-t border-bone/50" />
+            <span aria-hidden="true" className="pointer-events-none absolute bottom-0 left-0 z-10 h-3.5 w-3.5 border-b border-l border-bone/50" />
+            <span aria-hidden="true" className="pointer-events-none absolute bottom-0 right-0 z-10 h-3.5 w-3.5 border-b border-r border-bone/50" />
+          </div>
+        </TiltCard>
+      </motion.div>
+
+      <div ref={contentRef} className="relative z-10 flex flex-col gap-4 md:max-w-2xl">
+        <div className="flex items-center gap-4 font-mono text-[11px] uppercase tracking-[0.16em] text-bone/60">
+          <span className="text-uv">/{project.index}</span>
+          <span className="h-px w-8 bg-current/30" />
+          <span>{project.year}</span>
         </div>
-        <h3 className="relative font-display text-4xl leading-[0.95] tracking-[-0.03em] text-bone md:text-6xl">
+
+        <h3 className="font-display text-4xl leading-[0.95] tracking-[-0.03em] text-bone md:text-7xl">
           {project.name}
         </h3>
-        <div className="relative flex flex-wrap gap-2 font-mono text-[11px] uppercase tracking-[0.12em] text-bone/70">
+
+        <div className="flex flex-wrap gap-2 font-mono text-[11px] uppercase tracking-[0.12em] text-bone/70">
           {project.stack.map((tech) => (
-            <span key={tech}>{tech}</span>
+            <span key={tech} className="border border-bone/15 px-2.5 py-1">
+              {tech}
+            </span>
           ))}
         </div>
-        <p className="relative max-w-[50ch] text-bone/80">{project.problem}</p>
+
+        <p className="max-w-[50ch] text-bone/80">{project.problem}</p>
+
+        <button
+          type="button"
+          onClick={(e) => {
+            spawnRipple(e, "rgba(233,230,223,0.35)");
+            onSelect(project);
+          }}
+          onMouseEnter={() => setCursor("hover")}
+          onMouseLeave={resetCursor}
+          className="btn-shine group/btn relative mt-2 flex w-fit items-center gap-3 overflow-hidden border border-bone/25 px-6 py-3.5 font-mono text-[11px] uppercase tracking-[0.14em] text-bone transition-colors duration-300 hover:border-uv hover:bg-uv"
+        >
+          View case study
+          <span className="transition-transform duration-300 group-hover/btn:translate-x-1" aria-hidden="true">
+            →
+          </span>
+        </button>
       </div>
     </div>
   );
@@ -99,8 +149,9 @@ function Card({ project, imgRef, contentRef, onSelect }) {
 
 export function Work() {
   const sectionRef = useRef(null);
+  const trackWrapRef = useRef(null);
   const trackRef = useRef(null);
-  const imageRefs = useRef([]);
+  const imageWrapRefs = useRef([]);
   const contentRefs = useRef([]);
   const isMobile = useIsMobile();
   const [selected, setSelected] = useState(null);
@@ -115,7 +166,7 @@ export function Work() {
 
       const tl = gsap.timeline({
         scrollTrigger: {
-          trigger: sectionRef.current,
+          trigger: trackWrapRef.current,
           start: "top top",
           end: () => `+=${getTotalScroll()}`,
           scrub: true,
@@ -126,8 +177,8 @@ export function Work() {
 
       tl.to(trackRef.current, { x: () => -getTotalScroll(), duration: totalDuration, ease: "none" }, 0);
 
-      imageRefs.current.forEach((img) => {
-        if (img) tl.to(img, { xPercent: -10, duration: totalDuration, ease: "none" }, 0);
+      imageWrapRefs.current.forEach((img) => {
+        if (img) tl.to(img, { xPercent: -12, duration: totalDuration, ease: "none" }, 0);
       });
 
       // each card's copy overlaps in — scales and lifts as it becomes the centered card
@@ -148,34 +199,72 @@ export function Work() {
           );
         }
       });
+
+      // cinematic blur reveal on each image as its card centers — `filter` is a
+      // separate property from the xPercent parallax above, so nothing fights
+      // for `transform`.
+      imageWrapRefs.current.forEach((img, i) => {
+        if (!img || i === 0) return;
+        const center = i * segment;
+        tl.fromTo(
+          img,
+          { filter: "blur(10px) brightness(0.6)" },
+          { filter: "blur(0px) brightness(1)", duration: segment * 0.5, ease: "power2.out" },
+          Math.max(center - segment * 0.5, 0)
+        );
+      });
     }, sectionRef);
 
     return () => ctx.revert();
   }, [isMobile]);
 
   return (
-    <section id="work" ref={sectionRef} className="relative bg-ink text-bone">
-      <div className="absolute left-6 top-20 z-10 font-mono text-[11px] uppercase tracking-[0.12em] text-slate-inverse md:left-10 md:top-24">
-        /work
+    <section id="work" ref={sectionRef} className="relative overflow-hidden bg-ink text-bone">
+      {/* soft depth glow, echoes the language used in About / Stack */}
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute -left-1/4 top-1/3 -z-10 h-[34rem] w-[34rem] rounded-full opacity-[0.12] blur-3xl"
+        style={{
+          background: "radial-gradient(circle, rgba(79,47,240,0.9), transparent 70%)",
+          animation: "aurora-drift-a 20s ease-in-out infinite",
+        }}
+      />
+
+      {/* Big bold "Work" header — identical treatment to the About heading */}
+      <div className="w-full border-b border-bone/10 px-6 pb-6 pt-24 md:px-10 md:pb-10 md:pt-32">
+        <RouteLabel label="/work" className="mb-6 text-bone/50 md:mb-8" />
+        <CharReveal
+          text="Work"
+          tag="h2"
+          stagger={0.04}
+          className="font-display text-6xl font-extrabold uppercase leading-none tracking-tight text-bone sm:text-8xl md:text-[10rem]"
+        />
       </div>
 
       {isMobile ? (
         <div className="flex flex-col gap-24 px-6 py-16">
           {projects.map((project) => (
-            <div key={project.slug} className="relative h-[70vh]">
-              <Card project={project} imgRef={() => {}} onSelect={setSelected} />
-            </div>
+            <motion.div
+              key={project.slug}
+              initial={{ opacity: 0, y: 40 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, amount: 0.3 }}
+              transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
+              className="relative h-[70vh]"
+            >
+              <Card project={project} imgWrapRef={() => {}} contentRef={() => {}} onSelect={setSelected} />
+            </motion.div>
           ))}
         </div>
       ) : (
-        <div className="h-screen overflow-hidden">
+        <div ref={trackWrapRef} className="h-screen overflow-hidden">
           <div ref={trackRef} className="flex h-full w-max">
             {projects.map((project, i) => (
               <Card
                 key={project.slug}
                 project={project}
-                imgRef={(el) => {
-                  imageRefs.current[i] = el;
+                imgWrapRef={(el) => {
+                  imageWrapRefs.current[i] = el;
                 }}
                 contentRef={(el) => {
                   contentRefs.current[i] = el;

@@ -58,6 +58,8 @@ function Field({ id, label, type = "text", value, onChange, onFocus, onBlur, err
   const [focused, setFocused] = useState(false);
   const active = focused || value.length > 0;
   const Tag = textarea ? "textarea" : "input";
+  const setCursor = useCursor((s) => s.setState);
+  const resetCursor = useCursor((s) => s.reset);
 
   return (
     <div className="relative pt-7">
@@ -90,6 +92,8 @@ function Field({ id, label, type = "text", value, onChange, onFocus, onBlur, err
           setFocused(false);
           onBlur?.();
         }}
+        onMouseEnter={() => setCursor("text")}
+        onMouseLeave={resetCursor}
         className="w-full resize-none bg-transparent pb-3 pt-2 font-body text-lg outline-none"
       />
 

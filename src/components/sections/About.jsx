@@ -3,12 +3,15 @@ import { useEffect, useRef } from "react";
 
 import { site } from "../../content/site";
 import { gsap } from "../../lib/gsap";
+import { useCursor } from "../../store/useCursor";
 import { CharReveal } from "../ui/CharReveal";
 import { TiltCard } from "../ui/TiltCard";
 
 function PortraitFrame() {
   const wrapRef = useRef(null);
   const imageRef = useRef(null);
+  const setCursor = useCursor((s) => s.setState);
+  const resetCursor = useCursor((s) => s.reset);
 
   useEffect(() => {
     const ctx = gsap.context(() => {
@@ -67,6 +70,8 @@ function PortraitFrame() {
       <TiltCard max={6}>
         <div
           ref={wrapRef}
+          onMouseEnter={() => setCursor("card")}
+          onMouseLeave={resetCursor}
           className="group relative isolate aspect-[4/5] w-full overflow-hidden border border-current/15 bg-current/5"
         >
           <span aria-hidden="true" className="pointer-events-none absolute left-0 top-0 z-10 h-3 w-3 border-l border-t border-current/40" />
