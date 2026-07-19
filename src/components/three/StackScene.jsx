@@ -40,7 +40,7 @@ export function StackScene({ activeCategory, onHoverLogo, inView }) {
     <div className="relative h-full w-full">
       <Canvas
         dpr={[1, 1.75]}
-        camera={{ position: [0, 0, 6], fov: 45 }}
+        camera={{ position: [0, 0, 8.2], fov: 45 }}
         frameloop={inView ? "always" : "never"}
       >
         <directionalLight position={[3, 3, 3]} intensity={1} />

@@ -276,7 +276,6 @@ html.cursor-hidden * {
 }
 
 .glow-border {
-  position: relative;
   isolation: isolate;
 }
 

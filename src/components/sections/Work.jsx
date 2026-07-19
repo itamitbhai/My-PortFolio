@@ -1,284 +1,346 @@
-import { AnimatePresence, motion } from "framer-motion";
+import { motion } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
 
 import { projects } from "../../content/projects";
-import { useIsMobile } from "../../hooks/useIsMobile";
 import { gsap } from "../../lib/gsap";
-import { spawnRipple } from "../../lib/utils";
+import { useReducedMotion } from "../../hooks/useReducedMotion";
 import { useCursor } from "../../store/useCursor";
-import { RouteLabel } from "../layout/RouteLabel";
 import { CharReveal } from "../ui/CharReveal";
-import { TiltCard } from "../ui/TiltCard";
+import { RouteLabel } from "../layout/RouteLabel";
 
-function ProjectModal({ project, onClose }) {
+const projectDetails = {
+  vyapar: {
+    category: "Full-Stack Engineering"
+  },
+  pulse: {
+    category: "Real-Time Engineering"
+  },
+  orbit: {
+    category: "DevOps & Cloud Engineering"
+  },
+  quill: {
+    category: "Product & Desktop Development"
+  }
+};
+
+function getDetails(project) {
+  return projectDetails[project.slug] || { category: "Frontend Engineering" };
+}
+
+// Non-cinematic fallback for phones and reduced-motion users — a plain
+// vertical stack, no scroll-jacking.
+function SimpleProjectCard({ project, setCursor, resetCursor }) {
+  const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
+  const [hovered, setHovered] = useState(false);
+  const details = getDetails(project);
+
+  const handleMouseMove = (e) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    setMousePos({
+      x: e.clientX - rect.left,
+      y: e.clientY - rect.top
+    });
+  };
+
   return (
     <motion.div
-      className="fixed inset-0 z-[500] flex items-center justify-center bg-ink/90 p-6 md:p-12"
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      onClick={onClose}
+      initial={{ opacity: 0, y: 60 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, amount: 0.15 }}
+      transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
+      className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-16 py-12 md:py-20 border-b border-white/5 items-start"
     >
-      <motion.div
-        className="flex max-h-full w-full max-w-4xl flex-col gap-6 overflow-y-auto bg-bone p-6 text-ink md:flex-row md:p-10"
-        onClick={(e) => e.stopPropagation()}
-      >
-        <motion.img
-          layoutId={`project-image-${project.slug}`}
-          src={project.image}
-          alt={project.name}
-          className="h-64 w-full object-cover md:h-auto md:w-1/2"
-        />
-        <div className="flex flex-1 flex-col gap-4">
-          <div className="flex items-center justify-between font-mono text-[11px] uppercase tracking-[0.12em] text-slate">
-            <span>/{project.index}</span>
-            <span>{project.year}</span>
-          </div>
-          <h3 className="font-display text-4xl leading-[0.95] tracking-[-0.03em]">{project.name}</h3>
-          <p className="font-mono text-[11px] uppercase tracking-[0.12em] text-uv">{project.problem}</p>
-          <p className="max-w-[60ch] text-slate">{project.body}</p>
-          <div className="flex flex-wrap gap-2 font-mono text-[11px] uppercase tracking-[0.12em] text-slate">
-            {project.stack.map((tech) => (
-              <span key={tech} className="border border-current/10 px-2 py-1">
-                {tech}
-              </span>
-            ))}
-          </div>
-          <span className="font-mono text-[11px] uppercase tracking-[0.12em] text-slate">{project.role}</span>
-          <button
-            type="button"
-            onClick={onClose}
-            className="mt-auto w-fit border border-current/10 px-6 py-3 font-mono text-[11px] uppercase tracking-[0.12em] transition-colors hover:bg-ink hover:text-bone"
-          >
-            Close
-          </button>
+      <div className="lg:col-span-4 flex items-start select-none">
+        <span className="font-display font-extrabold text-[7rem] md:text-[10rem] lg:text-[14rem] leading-none text-white/5 transition-colors duration-500">
+          {project.index}.
+        </span>
+      </div>
+
+      <div className="lg:col-span-8 flex flex-col gap-6">
+        <div
+          onMouseEnter={() => {
+            setHovered(true);
+            setCursor("hover");
+          }}
+          onMouseLeave={() => {
+            setHovered(false);
+            resetCursor();
+          }}
+          onMouseMove={handleMouseMove}
+          onClick={() => window.open(project.link, "_blank")}
+          className="relative w-full aspect-[16/10] overflow-hidden rounded-2xl bg-white/5 cursor-pointer group shadow-xl"
+        >
+          <img
+            src={project.image}
+            alt={project.name}
+            className="w-full h-full object-cover transition-transform duration-[1000ms] cubic-bezier(0.16, 1, 0.3, 1) group-hover:scale-[1.05]"
+          />
+
+          {hovered && (
+            <div
+              className="pointer-events-none absolute z-20 flex items-center gap-1.5 px-3.5 py-1.5 bg-white/10 backdrop-blur-md border border-white/10 rounded-md text-[#E9E6DF] text-xs uppercase tracking-wide select-none shadow-lg"
+              style={{
+                left: mousePos.x,
+                top: mousePos.y,
+                transform: "translate(-50%, -50%)",
+                pointerEvents: "none"
+              }}
+            >
+              <svg
+                className="w-3.5 h-3.5 rotate-45 text-white/80"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                viewBox="0 0 24 24"
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+              </svg>
+              <span className="font-mono font-medium lowercase text-white/90">view</span>
+            </div>
+          )}
         </div>
-      </motion.div>
+
+        <div className="flex flex-col gap-2">
+          <span className="text-xs md:text-sm text-white/40 tracking-widest uppercase font-mono text-left select-none">
+            {details.category}
+          </span>
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <h3 className="font-display font-bold text-3xl md:text-4xl lg:text-5xl text-white tracking-tight text-left select-none">
+              {project.name}
+            </h3>
+
+            <div className="flex flex-wrap gap-2 items-center justify-start sm:justify-end">
+              {project.stack.map((tech) => (
+                <span
+                  key={tech}
+                  className="border border-white/10 rounded-full px-3.5 py-1 text-[11px] font-medium tracking-wide text-white/60 bg-white/[0.02] select-none"
+                >
+                  {tech}
+                </span>
+              ))}
+              <span className="bg-white/90 text-[#0F1115] rounded-full px-3.5 py-1 text-[11px] font-bold select-none shadow-sm">
+                {project.year}
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
     </motion.div>
   );
 }
 
-function Card({ project, imgWrapRef, contentRef, onSelect }) {
+export function Work() {
   const setCursor = useCursor((s) => s.setState);
   const resetCursor = useCursor((s) => s.reset);
+  const reducedMotion = useReducedMotion();
 
-  return (
-    <div className="relative flex h-full w-full shrink-0 flex-col justify-end gap-6 px-6 pb-28 pt-16 md:w-screen md:gap-8 md:px-16 md:pb-36">
-      <motion.div
-        className="glow-border absolute inset-6 md:inset-16"
-        initial={false}
-        whileHover={{ y: -8 }}
-        transition={{ type: "spring", stiffness: 260, damping: 22 }}
-        style={{
-          filter: "drop-shadow(0 30px 60px rgba(0,0,0,0.5))",
-        }}
-      >
-        <TiltCard max={5} className="h-full w-full">
-          <div className="group relative h-full w-full overflow-hidden border border-bone/15 bg-bone/5">
-            <button
-              type="button"
-              onClick={() => onSelect(project)}
-              onMouseEnter={() => setCursor("view", "View project")}
-              onMouseLeave={resetCursor}
-              className="relative block h-full w-full overflow-hidden"
-            >
-              {/* GSAP-owned parallax layer — xPercent only, never touched by CSS/hover transforms */}
-              <div ref={imgWrapRef} className="absolute inset-0 h-full w-full">
-                <motion.img
-                  layoutId={`project-image-${project.slug}`}
-                  src={project.image}
-                  alt={project.name}
-                  className="h-full w-full scale-[1.08] object-cover transition-transform duration-[900ms] ease-out group-hover:scale-[1.2]"
-                />
-              </div>
-
-              {/* legibility scrim + hover-brighten gradient glow */}
-              <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-ink via-ink/15 to-transparent opacity-80 transition-opacity duration-500 group-hover:opacity-55" />
-              <div className="pointer-events-none absolute inset-0 bg-uv/0 transition-colors duration-500 group-hover:bg-uv/[0.08]" />
-            </button>
-
-            {/* premium framing */}
-            <span aria-hidden="true" className="pointer-events-none absolute left-0 top-0 z-10 h-3.5 w-3.5 border-l border-t border-bone/50" />
-            <span aria-hidden="true" className="pointer-events-none absolute right-0 top-0 z-10 h-3.5 w-3.5 border-r border-t border-bone/50" />
-            <span aria-hidden="true" className="pointer-events-none absolute bottom-0 left-0 z-10 h-3.5 w-3.5 border-b border-l border-bone/50" />
-            <span aria-hidden="true" className="pointer-events-none absolute bottom-0 right-0 z-10 h-3.5 w-3.5 border-b border-r border-bone/50" />
-          </div>
-        </TiltCard>
-      </motion.div>
-
-      <div ref={contentRef} className="relative z-10 flex flex-col gap-4 md:max-w-2xl">
-        <div className="flex items-center gap-4 font-mono text-[11px] uppercase tracking-[0.16em] text-bone/60">
-          <span className="text-uv">/{project.index}</span>
-          <span className="h-px w-8 bg-current/30" />
-          <span>{project.year}</span>
-        </div>
-
-        <h3 className="font-display text-4xl leading-[0.95] tracking-[-0.03em] text-bone md:text-7xl">
-          {project.name}
-        </h3>
-
-        <div className="flex flex-wrap gap-2 font-mono text-[11px] uppercase tracking-[0.12em] text-bone/70">
-          {project.stack.map((tech) => (
-            <span key={tech} className="border border-bone/15 px-2.5 py-1">
-              {tech}
-            </span>
-          ))}
-        </div>
-
-        <p className="max-w-[50ch] text-bone/80">{project.problem}</p>
-
-        <button
-          type="button"
-          onClick={(e) => {
-            spawnRipple(e, "rgba(233,230,223,0.35)");
-            onSelect(project);
-          }}
-          onMouseEnter={() => setCursor("hover")}
-          onMouseLeave={resetCursor}
-          className="btn-shine group/btn relative mt-2 flex w-fit items-center gap-3 overflow-hidden border border-bone/25 px-6 py-3.5 font-mono text-[11px] uppercase tracking-[0.14em] text-bone transition-colors duration-300 hover:border-uv hover:bg-uv"
-        >
-          View case study
-          <span className="transition-transform duration-300 group-hover/btn:translate-x-1" aria-hidden="true">
-            →
-          </span>
-        </button>
-      </div>
-    </div>
+  const [isTabletUp, setIsTabletUp] = useState(
+    () => typeof window !== "undefined" && window.matchMedia("(min-width: 768px)").matches
   );
-}
-
-export function Work() {
-  const sectionRef = useRef(null);
-  const trackWrapRef = useRef(null);
-  const trackRef = useRef(null);
-  const imageWrapRefs = useRef([]);
-  const contentRefs = useRef([]);
-  const isMobile = useIsMobile();
-  const [selected, setSelected] = useState(null);
 
   useEffect(() => {
-    if (isMobile) return undefined;
+    const mql = window.matchMedia("(min-width: 768px)");
+    const handleChange = (e) => setIsTabletUp(e.matches);
+    mql.addEventListener("change", handleChange);
+    return () => mql.removeEventListener("change", handleChange);
+  }, []);
+
+  // desktop/tablet get the pinned cinematic slideshow; phones and
+  // prefers-reduced-motion get the plain scrolling stack above
+  const cinematic = isTabletUp && !reducedMotion;
+
+  const sectionRef = useRef(null);
+  const pinWrapRef = useRef(null);
+  const cardRefs = useRef([]);
+  const imgRefs = useRef([]);
+  const numberRef = useRef(null);
+  const titleRef = useRef(null);
+  const metaRef = useRef(null);
+
+  useEffect(() => {
+    if (!cinematic) return undefined;
+
+    const total = projects.length;
+    const cards = cardRefs.current;
+    const imgs = imgRefs.current;
+    if (cards.length !== total || cards.some((c) => !c)) return undefined;
 
     const ctx = gsap.context(() => {
-      const getTotalScroll = () => (projects.length - 1) * window.innerWidth;
-      const segment = 1;
-      const totalDuration = Math.max(projects.length - 1, 1) * segment;
+      gsap.set(cards[0], { y: 0, scale: 1, opacity: 1, rotationX: 0, pointerEvents: "auto" });
+      gsap.set(imgs[0], { scale: 1 });
+      for (let i = 1; i < total; i += 1) {
+        gsap.set(cards[i], {
+          y: 120,
+          scale: 0.95,
+          opacity: 0,
+          rotationX: 2,
+          pointerEvents: "none",
+          transformOrigin: "50% 100%"
+        });
+        gsap.set(imgs[i], { scale: 1.08 });
+      }
 
       const tl = gsap.timeline({
         scrollTrigger: {
-          trigger: trackWrapRef.current,
+          trigger: pinWrapRef.current,
           start: "top top",
-          end: () => `+=${getTotalScroll()}`,
-          scrub: true,
+          end: () => `+=${(total - 1) * window.innerHeight}`,
           pin: true,
+          scrub: 1,
+          anticipatePin: 1,
           invalidateOnRefresh: true,
-        },
-      });
-
-      tl.to(trackRef.current, { x: () => -getTotalScroll(), duration: totalDuration, ease: "none" }, 0);
-
-      imageWrapRefs.current.forEach((img) => {
-        if (img) tl.to(img, { xPercent: -12, duration: totalDuration, ease: "none" }, 0);
-      });
-
-      // each card's copy overlaps in — scales and lifts as it becomes the centered card
-      contentRefs.current.forEach((el, i) => {
-        if (!el) return;
-        const center = i * segment;
-        tl.fromTo(
-          el,
-          { yPercent: 26, opacity: 0.3, scale: 0.94 },
-          { yPercent: 0, opacity: 1, scale: 1, duration: segment * 0.8, ease: "none" },
-          Math.max(center - segment * 0.45, 0)
-        );
-        if (i < projects.length - 1) {
-          tl.to(
-            el,
-            { yPercent: -18, opacity: 0.3, duration: segment * 0.45, ease: "none" },
-            center + segment * 0.55
-          );
+          snap: {
+            snapTo: 1 / (total - 1),
+            duration: { min: 0.25, max: 0.6 },
+            ease: "power1.inOut"
+          }
         }
       });
 
-      // cinematic blur reveal on each image as its card centers — `filter` is a
-      // separate property from the xPercent parallax above, so nothing fights
-      // for `transform`.
-      imageWrapRefs.current.forEach((img, i) => {
-        if (!img || i === 0) return;
-        const center = i * segment;
-        tl.fromTo(
-          img,
-          { filter: "blur(10px) brightness(0.6)" },
-          { filter: "blur(0px) brightness(1)", duration: segment * 0.5, ease: "power2.out" },
-          Math.max(center - segment * 0.5, 0)
-        );
-      });
+      for (let i = 1; i < total; i += 1) {
+        const pos = i - 1;
+        const prevCard = cards[i - 1];
+        const nextCard = cards[i];
+        const nextImg = imgs[i];
+        const nextProject = projects[i];
+        const nextDetails = getDetails(nextProject);
+
+        tl.to(prevCard, { scale: 0.92, opacity: 0.6, y: -60, duration: 1.1, ease: "power4.inOut" }, pos)
+          .to(nextCard, { y: 0, scale: 1, opacity: 1, rotationX: 0, duration: 1.1, ease: "power4.inOut" }, pos)
+          .to(nextImg, { scale: 1, duration: 1.1, ease: "power4.inOut" }, pos)
+          .set(prevCard, { pointerEvents: "none" }, pos)
+          .set(nextCard, { pointerEvents: "auto" }, pos + 1)
+          .to(
+            numberRef.current,
+            {
+              opacity: 0,
+              duration: 0.35,
+              ease: "power2.in",
+              onComplete: () => {
+                numberRef.current.textContent = nextProject.index;
+              }
+            },
+            pos + 0.3
+          )
+          .to(numberRef.current, { opacity: 1, duration: 0.35, ease: "power2.out" }, pos + 0.55)
+          .to(
+            titleRef.current,
+            {
+              opacity: 0,
+              filter: "blur(10px)",
+              duration: 0.35,
+              ease: "power2.in",
+              onComplete: () => {
+                titleRef.current.textContent = nextProject.name;
+              }
+            },
+            pos + 0.3
+          )
+          .to(titleRef.current, { opacity: 1, filter: "blur(0px)", duration: 0.35, ease: "power2.out" }, pos + 0.55)
+          .to(
+            metaRef.current,
+            {
+              opacity: 0,
+              duration: 0.3,
+              onComplete: () => {
+                metaRef.current.textContent = `${nextDetails.category} — ${nextProject.year}`;
+              }
+            },
+            pos + 0.3
+          )
+          .to(metaRef.current, { opacity: 1, duration: 0.3 }, pos + 0.55);
+      }
     }, sectionRef);
 
     return () => ctx.revert();
-  }, [isMobile]);
+  }, [cinematic]);
+
+  const firstDetails = getDetails(projects[0]);
 
   return (
-    <section id="work" ref={sectionRef} className="relative overflow-hidden bg-ink text-bone">
-      {/* soft depth glow, echoes the language used in About / Stack */}
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute -left-1/4 top-1/3 -z-10 h-[34rem] w-[34rem] rounded-full opacity-[0.12] blur-3xl"
-        style={{
-          background: "radial-gradient(circle, rgba(79,47,240,0.9), transparent 70%)",
-          animation: "aurora-drift-a 20s ease-in-out infinite",
-        }}
-      />
-
-      {/* Big bold "Work" header — identical treatment to the About heading */}
-      <div className="w-full border-b border-bone/10 px-6 pb-6 pt-24 md:px-10 md:pb-10 md:pt-32">
-        <RouteLabel label="/work" className="mb-6 text-bone/50 md:mb-8" />
+    <section id="work" ref={sectionRef} className="relative w-full bg-[#0d0d0d] text-[#E9E6DF]">
+      {/* Big bold "Work" header — identical treatment to the Stack heading */}
+      <div className="w-full border-b border-white/10 px-6 pb-6 pt-16 md:px-10 md:pb-10 md:pt-24">
+        <RouteLabel label="/work" className="mb-6 text-white/50 md:mb-8" />
         <CharReveal
           text="Work"
           tag="h2"
           stagger={0.04}
-          className="font-display text-6xl font-extrabold uppercase leading-none tracking-tight text-bone sm:text-8xl md:text-[10rem]"
+          className="font-display text-6xl font-extrabold uppercase leading-none tracking-tight text-[#E9E6DF] sm:text-8xl md:text-[10rem]"
         />
       </div>
 
-      {isMobile ? (
-        <div className="flex flex-col gap-24 px-6 py-16">
-          {projects.map((project) => (
-            <motion.div
-              key={project.slug}
-              initial={{ opacity: 0, y: 40 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, amount: 0.3 }}
-              transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
-              className="relative h-[70vh]"
-            >
-              <Card project={project} imgWrapRef={() => {}} contentRef={() => {}} onSelect={setSelected} />
-            </motion.div>
-          ))}
-        </div>
-      ) : (
-        <div ref={trackWrapRef} className="h-screen overflow-hidden">
-          <div ref={trackRef} className="flex h-full w-max">
-            {projects.map((project, i) => (
-              <Card
-                key={project.slug}
-                project={project}
-                imgWrapRef={(el) => {
-                  imageWrapRefs.current[i] = el;
-                }}
-                contentRef={(el) => {
-                  contentRefs.current[i] = el;
-                }}
-                onSelect={setSelected}
-              />
-            ))}
+      {cinematic ? (
+        <div ref={pinWrapRef} className="relative h-screen w-full overflow-hidden">
+          <div className="absolute inset-0 flex items-center">
+            {/* HUD column — fixed index number + title, updates in place as slides advance */}
+            <div className="pointer-events-none z-40 flex w-[32%] max-w-[22rem] flex-shrink-0 select-none flex-col justify-center pl-6 lg:w-[30%] lg:pl-14">
+              <span
+                ref={numberRef}
+                className="block font-display text-[3.25rem] font-extrabold leading-none text-white/20 lg:text-[7rem]"
+                style={{ willChange: "opacity" }}
+              >
+                {projects[0].index}
+              </span>
+              <h3
+                ref={titleRef}
+                className="mt-3 font-display text-xl font-bold text-white lg:mt-6 lg:text-4xl"
+                style={{ willChange: "opacity, filter" }}
+              >
+                {projects[0].name}
+              </h3>
+              <p
+                ref={metaRef}
+                className="mt-2 font-mono text-xs uppercase tracking-[0.2em] text-white/40"
+                style={{ willChange: "opacity" }}
+              >
+                {firstDetails.category} — {projects[0].year}
+              </p>
+            </div>
+
+            {/* Stacked cinematic slides — separate column so they never fight the HUD for space */}
+            <div className="relative h-full flex-1" style={{ perspective: "1400px" }}>
+              {projects.map((project, i) => (
+                <div
+                  key={project.slug}
+                  ref={(el) => {
+                    cardRefs.current[i] = el;
+                  }}
+                  onMouseEnter={() => setCursor("hover")}
+                  onMouseLeave={resetCursor}
+                  onClick={() => window.open(project.link, "_blank")}
+                  className="absolute inset-0 flex cursor-pointer items-center justify-center pr-6 lg:pr-14"
+                  style={{ zIndex: i + 1, willChange: "transform, opacity" }}
+                >
+                  <div className="relative h-[68%] w-[92%] overflow-hidden rounded-2xl shadow-2xl lg:h-[76%] lg:w-[86%]">
+                    <img
+                      ref={(el) => {
+                        imgRefs.current[i] = el;
+                      }}
+                      src={project.image}
+                      alt={project.name}
+                      className="h-full w-full object-cover"
+                      style={{ willChange: "transform" }}
+                    />
+                    <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent" />
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
+      ) : (
+        <div className="mx-auto flex max-w-7xl flex-col px-6 py-12 md:px-10 md:py-16">
+          {projects.map((project) => (
+            <SimpleProjectCard
+              key={project.slug}
+              project={project}
+              setCursor={setCursor}
+              resetCursor={resetCursor}
+            />
+          ))}
+        </div>
       )}
-
-      <AnimatePresence>
-        {selected && <ProjectModal project={selected} onClose={() => setSelected(null)} />}
-      </AnimatePresence>
     </section>
   );
 }
