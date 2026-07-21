@@ -256,6 +256,18 @@ export function Hero() {
                   View work <span className="transition-transform duration-300 ease-out group-hover:translate-y-1">↓</span>
                 </a>
               </Magnetic>
+
+              <Magnetic className="w-fit">
+                <a
+                  href="/Amit_Resume.pdf"
+                  download
+                  onMouseEnter={() => setCursor("hover")}
+                  onMouseLeave={resetCursor}
+                  className="link-underline group inline-flex items-center gap-2 px-4 py-4 font-mono text-[11px] uppercase tracking-[0.12em] text-slate transition-colors hover:text-uv"
+                >
+                  Resume <span className="transition-transform duration-300 ease-out group-hover:translate-y-1">↓</span>
+                </a>
+              </Magnetic>
             </div>
           </MaskReveal>
         </div>

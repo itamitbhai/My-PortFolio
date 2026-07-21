@@ -10,7 +10,7 @@ import { Contact } from "./components/sections/Contact";
 import { Hero } from "./components/sections/Hero";
 import { Stack } from "./components/sections/Stack";
 import { Timeline } from "./components/sections/Timeline";
-import { Work } from "./components/sections/Work";
+import { Work } from "./sections/Work/Work";
 import { Marquee } from "./components/ui/Marquee";
 import { SectionDivider } from "./components/ui/SectionDivider";
 import { useLenis } from "./hooks/useLenis";
