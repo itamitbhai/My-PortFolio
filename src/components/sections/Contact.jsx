@@ -9,10 +9,10 @@ import { RouteLabel } from "../layout/RouteLabel";
 
 /* -------------------------------------------------------------------------- */
 /*  CONFIG                                                                     */
-/*  Set ENDPOINT and the form actually POSTs (Formspree / Resend / your API).  */
-/*  Leave it empty and it opens a pre-filled mail client instead — still works.*/
+/*  Web3Forms API endpoint is used. Make sure VITE_WEB3FORMS_ACCESS_KEY is     */
+/*  set in your .env file, otherwise it falls back to the mail client.         */
 /* -------------------------------------------------------------------------- */
-const ENDPOINT = ""; // e.g. "https://formspree.io/f/xxxxxxx"
+const ENDPOINT = "https://api.web3forms.com/submit";
 
 const EASE = [0.16, 1, 0.3, 1];
 const MONO = "font-mono text-[11px] uppercase tracking-[0.12em]";
@@ -238,14 +238,17 @@ export function Contact() {
     setResBody("");
     const t0 = performance.now();
 
-    if (!ENDPOINT) {
+    const accessKey = import.meta.env.VITE_WEB3FORMS_ACCESS_KEY;
+    const isConfigured = accessKey && accessKey !== "YOUR_WEB3FORMS_ACCESS_KEY_HERE" && accessKey.trim() !== "";
+
+    if (!isConfigured) {
       const subject = encodeURIComponent(`Portfolio — ${data.name}`);
       const body = encodeURIComponent(`${data.message}\n\n— ${data.name} (${data.email})`);
       window.location.href = `mailto:${site.email}?subject=${subject}&body=${body}`;
       setTimeout(() => {
         setLatency(Math.round(performance.now() - t0));
         setStatus("ok");
-        setResBody(`{\n  "ok": true,\n  "handoff": "mail client",\n  "to": "${site.email}"\n}`);
+        setResBody(`{\n  "ok": true,\n  "handoff": "mail client (env missing)",\n  "to": "${site.email}"\n}`);
       }, 450);
       return;
     }
@@ -254,18 +257,29 @@ export function Contact() {
       const res = await fetch(ENDPOINT, {
         method: "POST",
         headers: { "Content-Type": "application/json", Accept: "application/json" },
-        body: JSON.stringify({ ...data, ts: Date.now() }),
+        body: JSON.stringify({
+          access_key: accessKey,
+          name: data.name,
+          email: data.email,
+          message: data.message,
+          subject: `Portfolio Contact — ${data.name}`,
+          from_name: "Portfolio Website Contact Form"
+        }),
       });
       setLatency(Math.round(performance.now() - t0));
-      if (!res.ok) throw new Error(String(res.status));
+
+      const json = await res.json();
+      if (!res.ok || !json.success) {
+        throw new Error(json.message || String(res.status));
+      }
 
       setStatus("ok");
       setResBody(`{\n  "ok": true,\n  "message": "Received. I'll reply within 12h."\n}`);
       setForm({ name: "", email: "", message: "" });
-    } catch {
+    } catch (err) {
       setLatency(Math.round(performance.now() - t0));
       setStatus("error");
-      setResBody(`{\n  "ok": false,\n  "error": "delivery failed",\n  "fallback": "${site.email}"\n}`);
+      setResBody(`{\n  "ok": false,\n  "error": "delivery failed",\n  "details": "${err.message || "Unknown error"}",\n  "fallback": "${site.email}"\n}`);
       setShake((s) => s + 1);
     }
   };
