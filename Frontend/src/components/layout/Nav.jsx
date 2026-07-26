@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
 import { site } from "../../content/site";
@@ -11,18 +11,16 @@ const LINKS = [
   { href: "#stack", label: "Stack" },
   { href: "#work", label: "Work" },
   { href: "#timeline", label: "Timeline" },
+  { href: "#achievements", label: "Achievements" },
   { href: "#contact", label: "Contact" },
 ];
 
 export function Nav() {
   const setCursor = useCursor((s) => s.setState);
   const resetCursor = useCursor((s) => s.reset);
-  const [theme, setTheme] = useState("light");
-
-  useEffect(() => {
-    const isDark = document.documentElement.classList.contains("dark");
-    setTheme(isDark ? "dark" : "light");
-  }, []);
+  const [theme, setTheme] = useState(() =>
+    document.documentElement.classList.contains("dark") ? "dark" : "light"
+  );
 
   const toggleTheme = () => {
     const newTheme = theme === "light" ? "dark" : "light";

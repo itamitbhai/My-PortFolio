@@ -6,6 +6,7 @@ import { Nav } from "./components/layout/Nav";
 import { Preloader } from "./components/layout/Preloader";
 import { ScrollProgress } from "./components/layout/ScrollProgress";
 import { About } from "./components/sections/About";
+import { Achievements } from "./components/sections/Achievements";
 import { Contact } from "./components/sections/Contact";
 import { Hero } from "./components/sections/Hero";
 import { Stack } from "./components/sections/Stack";
@@ -40,6 +41,8 @@ function App() {
         <Work />
         <SectionDivider variant="wave" />
         <Timeline />
+        <SectionDivider variant="beam" />
+        <Achievements />
         <SectionDivider variant="aurora" />
         <Contact />
       </main>

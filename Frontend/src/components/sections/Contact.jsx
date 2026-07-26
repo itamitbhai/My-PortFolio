@@ -130,7 +130,7 @@ function Field({ id, label, type = "text", value, onChange, onFocus, onBlur, err
 function Line({ n, children, active }) {
   return (
     <div className="relative flex gap-4">
-      <span className="w-5 shrink-0 select-none text-right text-bone/25">{n}</span>
+      <span className="w-5 shrink-0 select-none text-right text-[#E9E6DF]/25">{n}</span>
       <span className="relative flex-1">
         {active && (
           <motion.span
@@ -147,7 +147,7 @@ function Line({ n, children, active }) {
 
 const K = ({ children }) => <span className="text-uv">{children}</span>;
 const S = ({ children }) => <span style={{ color: OK }}>{children}</span>;
-const P = ({ children }) => <span className="text-bone/35">{children}</span>;
+const P = ({ children }) => <span className="text-[#E9E6DF]/35">{children}</span>;
 
 function Caret({ on }) {
   if (!on) return null;
@@ -302,18 +302,6 @@ export function Contact() {
 
   useLayoutEffect(() => {
     const ctx = gsap.context(() => {
-      gsap.to(document.documentElement, {
-        "--scroll-bg": "#E9E6DF",
-        "--scroll-fg": "#0F1115",
-        ease: "none",
-        scrollTrigger: {
-          trigger: sectionRef.current,
-          start: "top 85%",
-          end: "top 25%",
-          scrub: true,
-        },
-      });
-
       gsap.set("[data-mask] > *", { yPercent: 110 });
       gsap.to("[data-mask] > *", {
         yPercent: 0,
@@ -397,7 +385,7 @@ export function Contact() {
                 disabled={status === "sending"}
                 onMouseEnter={() => setCursor("hover")}
                 onMouseLeave={resetCursor}
-                className={`${MONO} btn-shine group relative isolate overflow-hidden border border-current/20 px-9 py-5 outline-none transition-colors duration-300 hover:text-bone focus-visible:ring-2 focus-visible:ring-uv disabled:opacity-50`}
+                className={`${MONO} btn-shine group relative isolate overflow-hidden border border-current/20 px-9 py-5 outline-none transition-colors duration-300 hover:text-[#E9E6DF] focus-visible:ring-2 focus-visible:ring-uv disabled:opacity-50`}
               >
                 <span className="absolute inset-0 -z-10 origin-bottom scale-y-0 bg-uv transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-y-100" />
                 {status === "sending" ? "Sending…" : "Send request"}
@@ -420,7 +408,7 @@ export function Contact() {
             key={shake}
             animate={shake ? { x: [0, -9, 8, -5, 0] } : {}}
             transition={{ duration: 0.4 }}
-            className="relative overflow-hidden bg-ink text-bone"
+            className="relative overflow-hidden bg-[#0F1115] text-[#E9E6DF]"
           >
             {/* success scanline */}
             <AnimatePresence>
@@ -436,8 +424,8 @@ export function Contact() {
             </AnimatePresence>
 
             {/* top bar */}
-            <div className="flex items-center justify-between gap-4 border-b border-bone/10 px-5 py-4">
-              <span className={`${MONO} text-bone/50`}>POST /api/contact</span>
+            <div className="flex items-center justify-between gap-4 border-b border-[#E9E6DF]/10 px-5 py-4">
+              <span className={`${MONO} text-[#E9E6DF]/50`}>POST /api/contact</span>
               <span className={`${MONO} flex items-center gap-2`} style={{ color: meta.color }}>
                 <motion.span
                   className="h-1.5 w-1.5 rounded-full"
@@ -452,8 +440,8 @@ export function Contact() {
             {/* payload */}
             <pre className="overflow-x-auto px-5 py-6 font-mono text-[12.5px] leading-[2]">
               <Line n={1}>
-                <span className="text-bone/50">Content-Type:</span>{" "}
-                <span className="text-bone/80">application/json</span>
+                <span className="text-[#E9E6DF]/50">Content-Type:</span>{" "}
+                <span className="text-[#E9E6DF]/80">application/json</span>
               </Line>
               <Line n={2}>
                 <P>{"{"}</P>

@@ -135,19 +135,6 @@ export function Stack() {
 
   useEffect(() => {
     const ctx = gsap.context(() => {
-      // scroll bg and fg updates
-      gsap.to(document.documentElement, {
-        "--scroll-bg": "#0F1115",
-        "--scroll-fg": "#E9E6DF",
-        ease: "none",
-        scrollTrigger: {
-          trigger: sectionRef.current,
-          start: "top 80%",
-          end: "bottom 20%",
-          scrub: true,
-        },
-      });
-
       // slow parallax drift on the background glow
       gsap.to("[data-stack-glow]", {
         yPercent: 12,
@@ -196,7 +183,7 @@ export function Stack() {
   }, []);
 
   return (
-    <section id="stack" ref={sectionRef} className="relative flex flex-col gap-10 overflow-hidden px-6 py-24 md:gap-16 md:px-10 md:py-32 text-[#E9E6DF]">
+    <section id="stack" ref={sectionRef} className="relative flex flex-col gap-10 overflow-hidden bg-[#0F1115] px-6 py-24 md:gap-16 md:px-10 md:py-32 text-[#E9E6DF]">
       {/* slow-drifting background glow, matches the language used in About */}
       <div
         data-stack-glow

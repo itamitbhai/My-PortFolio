@@ -184,7 +184,7 @@ export function About() {
                 style={{
                   marginRight: "0.22em",
                   color:
-                    "color-mix(in srgb, var(--scroll-fg, var(--fg)) calc(var(--reveal, 0) * 100%), rgb(var(--slate)) calc((1 - var(--reveal, 0)) * 100%))",
+                    "color-mix(in srgb, var(--fg) calc(var(--reveal, 0) * 100%), rgb(var(--slate)) calc((1 - var(--reveal, 0)) * 100%))",
                 }}
               >
                 {word}

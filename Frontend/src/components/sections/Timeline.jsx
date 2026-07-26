@@ -36,8 +36,8 @@ export function Timeline() {
   }, []);
 
   return (
-    <section id="timeline" ref={sectionRef} className="relative bg-ink px-6 py-24 text-bone md:px-10 md:py-32">
-      <RouteLabel label="/timeline" className="text-slate-inverse" />
+    <section id="timeline" ref={sectionRef} className="relative bg-[#0F1115] px-6 py-24 text-[#E9E6DF] md:px-10 md:py-32">
+      <RouteLabel label="/timeline" className="text-[#9FA4AC]" />
 
       <div className="relative mt-12 grid grid-cols-[64px_1fr] gap-6 md:grid-cols-[140px_1fr] md:gap-12">
         <svg className="pointer-events-none absolute left-[31px] top-0 h-full w-px md:left-[69px]" aria-hidden="true">
@@ -61,7 +61,7 @@ export function Timeline() {
 
         {timeline.map((entry, i) => (
           <div key={entry.year} className="contents">
-            <div className="sticky top-24 h-fit font-mono text-[11px] uppercase tracking-[0.12em] text-slate-inverse">
+            <div className="sticky top-24 h-fit font-mono text-[11px] uppercase tracking-[0.12em] text-[#9FA4AC]">
               {entry.year}
             </div>
             <motion.div
@@ -82,7 +82,7 @@ export function Timeline() {
               <span className="font-mono text-[11px] uppercase tracking-[0.12em] text-uv transition-[text-shadow] duration-300 hover:[text-shadow:0_0_14px_rgba(79,47,240,0.6)]">
                 {entry.org}
               </span>
-              <p className="max-w-[55ch] text-bone/70">{entry.body}</p>
+              <p className="max-w-[55ch] text-[#E9E6DF]/70">{entry.body}</p>
             </motion.div>
           </div>
         ))}

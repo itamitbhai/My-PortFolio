@@ -133,7 +133,12 @@ export function Work() {
   };
 
   return (
-    <section id="work" ref={rootRef} className="w-full" style={{ minHeight: "100vh" }}>
+    <section
+      id="work"
+      ref={rootRef}
+      className="w-full bg-[#0F1115]"
+      style={{ minHeight: "100vh" }}
+    >
       <div className="mx-auto max-w-[1440px] px-6 py-24 md:px-12 md:py-32 lg:py-40">
         {/* header */}
         <div className="mb-24 md:mb-32 lg:mb-48">
@@ -146,7 +151,7 @@ export function Work() {
           </p>
           <h2 ref={headingRef} className="mt-4">
             <MaskedHeading
-              text="SELECTED WORK"
+              text="WORK"
               className="font-display block font-extrabold uppercase leading-[0.95] tracking-tight text-[clamp(2.5rem,12vw,5rem)] lg:text-[clamp(4rem,11vw,10rem)]"
               style={{ color: TEXT }}
             />
