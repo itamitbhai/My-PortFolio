@@ -20,15 +20,14 @@ export function Marquee() {
 
     const loop = () => {
       const lenis = getLenis();
-      const velocity = lenis?.velocity ?? 0;
+      const velocity = Math.max(-40, Math.min(40, lenis?.velocity ?? 0));
       const speed = baseSpeed + velocity * 0.6;
 
       xRef.current -= speed;
 
       const width = track.scrollWidth / 2;
       if (width > 0) {
-        if (xRef.current <= -width) xRef.current += width;
-        if (xRef.current > 0) xRef.current -= width;
+        xRef.current = (((xRef.current % width) + width) % width) - width;
       }
 
       gsap.set(track, { x: xRef.current });
