@@ -34,7 +34,8 @@ function FeaturedCard({ item, index, setCardRef, setNumberRef }) {
         <span
           ref={setNumberRef}
           aria-hidden="true"
-          className="pointer-events-none absolute -right-4 -top-10 select-none font-display text-[8rem] font-extrabold leading-none text-current/[0.05] md:-top-14 md:text-[11rem]"
+          className="pointer-events-none absolute -right-4 -top-10 select-none font-display text-[8rem] font-extrabold leading-none md:-top-14 md:text-[11rem]"
+          style={{ color: "color-mix(in srgb, currentColor 5%, transparent)" }}
         >
           {String(index + 1).padStart(2, "0")}
         </span>
@@ -54,7 +55,7 @@ function FeaturedCard({ item, index, setCardRef, setNumberRef }) {
         <div className="relative flex flex-1 flex-col gap-3">
           <div className="flex flex-wrap items-center gap-3 font-mono text-[11px] uppercase tracking-[0.12em] text-uv">
             <span>{item.org}</span>
-            <span aria-hidden="true" className="text-current/30">·</span>
+            <span aria-hidden="true" style={{ color: "color-mix(in srgb, currentColor 30%, transparent)" }}>·</span>
             <span>{item.year}</span>
           </div>
           <h3 className="font-display text-3xl tracking-[-0.02em] md:text-5xl">{item.title}</h3>
@@ -84,7 +85,8 @@ function AchievementCard({ item, index, accent, setCardRef, setNumberRef }) {
         <span
           ref={setNumberRef}
           aria-hidden="true"
-          className="pointer-events-none absolute -right-2 -top-6 select-none font-display text-[5rem] font-extrabold leading-none text-current/[0.06] md:text-[6rem]"
+          className="pointer-events-none absolute -right-2 -top-6 select-none font-display text-[5rem] font-extrabold leading-none md:text-[6rem]"
+          style={{ color: "color-mix(in srgb, currentColor 6%, transparent)" }}
         >
           {String(index + 1).padStart(2, "0")}
         </span>
@@ -99,7 +101,7 @@ function AchievementCard({ item, index, accent, setCardRef, setNumberRef }) {
         <div className="relative flex flex-1 flex-col gap-2">
           <div className="flex flex-wrap items-center gap-2 font-mono text-[11px] uppercase tracking-[0.12em] text-uv">
             <span>{item.org}</span>
-            <span aria-hidden="true" className="text-current/30">·</span>
+            <span aria-hidden="true" style={{ color: "color-mix(in srgb, currentColor 30%, transparent)" }}>·</span>
             <span className="text-slate">{item.year}</span>
           </div>
           <h3 className="font-display text-xl tracking-[-0.02em] md:text-2xl">{item.title}</h3>
@@ -107,7 +109,10 @@ function AchievementCard({ item, index, accent, setCardRef, setNumberRef }) {
         </div>
 
         {item.metric && (
-          <div className="relative mt-auto flex items-baseline gap-2 border-t border-current/10 pt-4">
+          <div
+            className="relative mt-auto flex items-baseline gap-2 border-t pt-4"
+            style={{ borderColor: "color-mix(in srgb, currentColor 10%, transparent)" }}
+          >
             <span className="font-display text-lg font-extrabold leading-none text-ink">{item.metric}</span>
             <span className="font-mono text-[10px] uppercase tracking-[0.1em] text-slate">{item.metricLabel}</span>
           </div>
